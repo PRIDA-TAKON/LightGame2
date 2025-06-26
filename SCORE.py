@@ -4,7 +4,7 @@ from pythonosc import osc_server, udp_client, dispatcher
 # --- 1. Global Configuration ---
 # การตั้งค่าสำหรับ Socket Communication (กับโปรแกรมอื่นบนเครื่องเดียวกัน โปรแกรมเล่นเกมปุ่มกดของ FVS)
 OTHER_PROGRAM_SOCKET_HOST = '127.0.0.1' # โปรแกรมอยู่บนเครื่องเดียวกัน
-OTHER_PROGRAM_SOCKET_PORT = 12345        # Port ที่โปรแกรมอื่นฟังอยู่
+OTHER_PROGRAM_SOCKET_PORT = 12345        # Port ที่โปรแกรมเล่นเกมปุ่มกดฟังอยู่
 SOCKET_COMMAND_TO_START = "START_CALCULATION" # คำสั่งสำหรับให้โปรแกรมอื่นเริ่มทำงาน
 
 # การตั้งค่าสำหรับ OSC Communication (กับโปรแกรม UI บนเครื่องอื่น ของทีมปิกนิค)
