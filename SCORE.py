@@ -3,12 +3,12 @@ import time
 from pythonosc import osc_server, udp_client, dispatcher
 
 # --- 1. Global Configuration ---
-# การตั้งค่าสำหรับ Socket Communication (กับโปรแกรมอื่นบนเครื่องเดียวกัน)
+# การตั้งค่าสำหรับ Socket Communication (กับโปรแกรมอื่นบนเครื่องเดียวกัน โปรแกรมเล่นเกมปุ่มกดของ FVS)
 OTHER_PROGRAM_SOCKET_HOST = '127.0.0.1' # โปรแกรมอยู่บนเครื่องเดียวกัน
 OTHER_PROGRAM_SOCKET_PORT = 12345        # Port ที่โปรแกรมอื่นฟังอยู่
 SOCKET_COMMAND_TO_START = "START_CALCULATION" # คำสั่งสำหรับให้โปรแกรมอื่นเริ่มทำงาน
 
-# การตั้งค่าสำหรับ OSC Communication (กับโปรแกรม UI บนเครื่องอื่น)
+# การตั้งค่าสำหรับ OSC Communication (กับโปรแกรม UI บนเครื่องอื่น ของทีมปิกนิค)
 # OSC Server (Python Script จะรับคำสั่งจาก UI ที่ Port นี้)
 OSC_LISTEN_IP = '0.0.0.0' # ฟังการเชื่อมต่อจากทุก IP
 OSC_LISTEN_PORT = 5005    # Port ที่ Python script จะรับ OSC เข้ามา
@@ -21,7 +21,7 @@ UI_PROGRAM_OSC_PORT = 5006      # Port ที่ UI Program ฟัง OSC อย
 OSC_ADDRESS_START_PROCESS = "/start_process" # UI จะส่งคำสั่งมาที่ address นี้
 OSC_ADDRESS_RESULT = "/calculation_result"   # Python script จะส่งผลลัพธ์กลับไปที่ address นี้
 
-# --- 2. Function for Socket Communication (กับโปรแกรมอื่น) ---
+# --- 2. Function for Socket Communication (กับโปรแกรมเกมปุ่มกดของ FVS) ---
 def communicate_with_other_program(command):
     """
     เชื่อมต่อไปยังโปรแกรมอื่นผ่าน Socket, ส่งคำสั่ง, และรับค่ากลับมา
@@ -57,24 +57,46 @@ def communicate_with_other_program(command):
 
 # --- 3. Function for Data Calculation ---
 def perform_calculation(data_string):
-    """
-    รับข้อมูลสตริงมาคำนวณและส่งคืนผลลัพธ์
-    คุณจะต้องปรับแก้ส่วนนี้ให้เหมาะสมกับรูปแบบข้อมูลที่ได้รับ
-    """
+    
+    #รับข้อมูลสตริงมาคำนวณและส่งคืนผลลัพธ์
+    #จะต้องปรับแก้ส่วนนี้ให้เหมาะสมกับรูปแบบข้อมูลที่ได้รับ
+    
     print(f"\n[Calculation] กำลังประมวลผลข้อมูล: '{data_string}'")
-    try:
-        # ตัวอย่าง: ถ้าข้อมูลเป็นตัวเลข (เช่น "123.45")
-        numeric_value = float(data_string)
-        calculated_result = numeric_value * 1.5 + 10 # ตัวอย่างการคำนวณ
-        print(f"[Calculation] ผลลัพธ์: {calculated_result}")
-        return calculated_result
+              
+    A1 = 5.0 # สัมประสิทธิ์สำหรับ correct_hits_1
+    A2 = 4.0 # สัมประสิทธิ์สำหรับ correct_hits_2
+    A3 = 3.0 # สัมประสิทธิ์สำหรับ correct_hits_3
+    incorrect_hits_1 = 4 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
+    stage_duration_sec_1 = 10.0 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
+    incorrect_hits_2 = 2 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
+    stage_duration_sec_2 = 5.0 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
+    incorrect_hits_3 = 1 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
+    stage_duration_sec_3 = 3.0 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
+    # คำนวณผลลัพธ์ตามสูตรที่กำหนด
+    """        
+    incorrect_hits_1 = raw_data.get("incorrect_hits_1", 0)
+    stage_duration_sec_1 = raw_data.get("stage_duration_sec_1", 0.0)
 
-    except ValueError:
-        print(f"[Calculation ERROR] ไม่สามารถแปลง '{data_string}' เป็นตัวเลขได้")
-        return None
-    except Exception as e:
-        print(f"[Calculation ERROR] เกิดข้อผิดพลาดในการคำนวณ: {e}")
-        return None
+    incorrect_hits_2 = raw_data.get("incorrect_hits_2", 0)
+    stage_duration_sec_2 = raw_data.get("stage_duration_sec_2", 0.0)
+
+    incorrect_hits_3 = raw_data.get("incorrect_hits_3", 0)
+    stage_duration_sec_3 = raw_data.get("stage_duration_sec_3", 0.0)
+    """
+
+    score_1 = incorrect_hits_1*A1 + stage_duration_sec_1
+    score_2 = incorrect_hits_2*A2 + stage_duration_sec_2
+    score_3 = incorrect_hits_3*A3 + stage_duration_sec_3
+
+
+    score = score_1 + score_2 + score_3
+    total_time = stage_duration_sec_1 + stage_duration_sec_2 + stage_duration_sec_3
+    
+    calculated_result_score = score / total_time if total_time > 0 else 0  # ตัวอย่างการคำนวณ
+    calculated_result_time = total_time  # ตัวอย่างการคำนวณเวลา 
+    print(f"[Calculation] ผลลัพธ์: {calculated_result_score,calculated_result_time }")
+    return calculated_result_score , calculated_result_time  # ส่งคืนผลลัพธ์ที่คำนวณได้
+    
 
 # --- 4. Function for OSC Communication (ส่งผลลัพธ์กลับ UI) ---
 def send_osc_result(result):
@@ -139,7 +161,7 @@ if __name__ == "__main__":
 
 
 
-
+"""
 # --- กำหนดค่าคงที่ (Constants) ---ส่วนคิดคะแนน
 SCORE_FILE_PATH = "C:\\Users\\SGVT\\OneDrive\\เดสก์ท็อป\\LightGame2\\LightGame2\\raw_score.json"
 
@@ -159,7 +181,7 @@ A1 = 5.0 # สัมประสิทธิ์สำหรับ correct_hits_1
 A2 = 4.0 # สัมประสิทธิ์สำหรับ correct_hits_2
 A3 = 3.0 # สัมประสิทธิ์สำหรับ correct_hits_3
 
-profile_id = raw_data.get("player_id")
+
 
 incorrect_hits_1 = raw_data.get("incorrect_hits_1", 0)
 stage_duration_sec_1 = raw_data.get("stage_duration_sec_1", 0.0)
@@ -175,8 +197,6 @@ score_2 = incorrect_hits_2*A2 + stage_duration_sec_2
 score_3 = incorrect_hits_3*A3 + stage_duration_sec_3
 
 score = score_1 + score_2 + score_3
-
-print(profile_id)
 print(score)
 
-
+"""
