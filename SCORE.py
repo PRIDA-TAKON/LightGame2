@@ -1,5 +1,4 @@
 import socket
-import time
 from pythonosc import osc_server, udp_client, dispatcher
 
 # --- 1. Global Configuration ---
@@ -11,9 +10,9 @@ SOCKET_COMMAND_TO_START = "START_CALCULATION" # คำสั่งสำหร�
 # การตั้งค่าสำหรับ OSC Communication (กับโปรแกรม UI บนเครื่องอื่น ของทีมปิกนิค)
 # OSC Server (Python Script จะรับคำสั่งจาก UI ที่ Port นี้)
 OSC_LISTEN_IP = '0.0.0.0' # ฟังการเชื่อมต่อจากทุก IP
-OSC_LISTEN_PORT = 5005    # Port ที่ Python script จะรับ OSC เข้ามา
+OSC_LISTEN_PORT = 5005    # Port ที่ Python script จะรับ OSC เข้ามา เป็น PORT ของสคริปนี้
 
-# OSC Client (Python Script จะส่งผลลัพธ์ไปที่ UI Program)
+# OSC Client (Python Script จะส่งผลลัพธ์ไปที่ UI Program บนเครื่องอื่น ของทีมปิกนิค)
 UI_PROGRAM_IP = '192.168.1.100' # !!! แก้ไขเป็น IP ของเครื่อง UI Program !!!
 UI_PROGRAM_OSC_PORT = 5006      # Port ที่ UI Program ฟัง OSC อยู่
 
@@ -92,10 +91,12 @@ def perform_calculation(data_string):
     score = score_1 + score_2 + score_3
     total_time = stage_duration_sec_1 + stage_duration_sec_2 + stage_duration_sec_3
     
-    calculated_result_score = score / total_time if total_time > 0 else 0  # ตัวอย่างการคำนวณ
+    calculated_result_score = score # ตัวอย่างการคำนวณคะแนน
     calculated_result_time = total_time  # ตัวอย่างการคำนวณเวลา 
     print(f"[Calculation] ผลลัพธ์: {calculated_result_score,calculated_result_time }")
-    return calculated_result_score , calculated_result_time  # ส่งคืนผลลัพธ์ที่คำนวณได้
+    # ส่งคืนผลลัพธ์เป็นสตริงเดียว เช่น "3.0,18.0"
+    result_str = f"{calculated_result_score},{calculated_result_time}"
+    return result_str  # ส่งคืนผลลัพธ์ที่คำนวณได้เป็นสตริง
     
 
 # --- 4. Function for OSC Communication (ส่งผลลัพธ์กลับ UI) ---
@@ -106,7 +107,7 @@ def send_osc_result(result):
     try:
         osc_client = udp_client.SimpleUDPClient(UI_PROGRAM_IP, UI_PROGRAM_OSC_PORT)
         osc_client.send_message(OSC_ADDRESS_RESULT, result)
-        print(f"\n[OSC Client] ส่งผลลัพธ์ '{result}' ไปยัง UI ที่ {UI_PROGRAM_IP}:{UI_PROGRAM_OSC_PORT} ผ่าน address '{OSC_ADDRESS_RESULT}'")
+        print(f"\n[OSC Client] ส่งผลลัพธ์ (string) '{result}' ไปยัง UI ที่ {UI_PROGRAM_IP}:{UI_PROGRAM_OSC_PORT} ผ่าน address '{OSC_ADDRESS_RESULT}'")
     except Exception as e:
         print(f"[OSC Client ERROR] ไม่สามารถส่งข้อความ OSC ได้: {e}")
 
