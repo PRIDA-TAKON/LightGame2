@@ -21,7 +21,12 @@
 | 5. Sends calculated result back to UI via OSC (e.g., "/result") |
 +-----------------------------------------------------------------+
 
-ตั้งค่าให้ SCORE.py ทำงานเมื่อเปิดเครื่องเสมอ
+ตั้งค่าให้ SCORE.py ทำงานเมื่อเปิดเครื่องเสมอ หลังจาก copy สคริปมาวางแล้ว
+ส่วนจำเป็นที่ต้องมีในเครื่อง
+python ติดตั้งในเครื่องก่อน
+socket 1.0.0 ติดตั้งผ่าน terminal คำสั่ง pip install sockets
+pythonosc python-osc 1.9.3 ติดตั้งผ่าน terminal คำสั่ง pip install python-osc
+
 1 เปิด Task Scheduler:
 กดปุ่ม Windows + R พิมพ์ taskschd.msc แล้วกด Enter
 หรือค้นหา "Task Scheduler" ใน Start Menu
