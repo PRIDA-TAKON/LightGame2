@@ -1,4 +1,5 @@
 import socket
+import time
 from pythonosc import osc_server, udp_client, dispatcher
 from random import randint
 
@@ -62,44 +63,9 @@ def perform_calculation(data_string):
     #จะต้องปรับแก้ส่วนนี้ให้เหมาะสมกับรูปแบบข้อมูลที่ได้รับ
     
     print(f"\n[Calculation] กำลังประมวลผลข้อมูล: '{data_string}'")
-              
-    A1 = 5.0 # สัมประสิทธิ์สำหรับ correct_hits_1
-    A2 = 4.0 # สัมประสิทธิ์สำหรับ correct_hits_2
-    A3 = 3.0 # สัมประสิทธิ์สำหรับ correct_hits_3
-    """
-    #ตัวอย่างข้อมูลส่งกลับมา (4,10.0,2,5.0,1,3.0)
-    #ตัวอย่างข้อมูลส่งกลับมา (จำนวนปุ่มผิด_stage_1,เวลา_stage_1,จำนวนปุ่มผิด_stage_2,เวลา_stage_2,จำนวนปุ่มผิด_stage_3,เวลา_stage_3)
-    incorrect_hits_1 = 4 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
-    stage_duration_sec_1 = 10.0 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
-    incorrect_hits_2 = 2 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
-    stage_duration_sec_2 = 5.0 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
-    incorrect_hits_3 = 1 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
-    stage_duration_sec_3 = 3.0 # ตัวอย่างค่าที่ได้จากโปรแกรมเกม รอเชคจาก FVS
-    # คำนวณผลลัพธ์ตามสูตรที่กำหนด
-    """     
-    incorrect_hits_1 = raw_data.get("incorrect_hits_1", 0)
-    stage_duration_sec_1 = raw_data.get("stage_duration_sec_1", 0.0)
 
-    incorrect_hits_2 = raw_data.get("incorrect_hits_2", 0)
-    stage_duration_sec_2 = raw_data.get("stage_duration_sec_2", 0.0)
-
-    incorrect_hits_3 = raw_data.get("incorrect_hits_3", 0)
-    stage_duration_sec_3 = raw_data.get("stage_duration_sec_3", 0.0)
-    
-
-    score_1 = incorrect_hits_1*A1 + stage_duration_sec_1
-    score_2 = incorrect_hits_2*A2 + stage_duration_sec_2
-    score_3 = incorrect_hits_3*A3 + stage_duration_sec_3
-
-
-    score = score_1 + score_2 + score_3
-    total_time = stage_duration_sec_1 + stage_duration_sec_2 + stage_duration_sec_3
-    
-
-    calculated_result_score = score # ตัวอย่างการคำนวณคะแนน
-    calculated_result_time = total_time  # ตัวอย่างการคำนวณเวลา 
-    
-
+    calculated_result_score = randint(49, 100) # ใช้ค่า random แทนการคำนวณจริงเพื่อทดสอบ
+    calculated_result_time = randint(4, 10)  # ใช้ค่า random แทนการคำนวณจริงเพื่อทดสอบ
 
 
     print(f"[Calculation] ผลลัพธ์: {calculated_result_score,calculated_result_time }")
@@ -127,23 +93,16 @@ def handle_start_process(address, *args):
     """
     print(f"\n[OSC Server] ได้รับคำสั่ง OSC จาก UI ที่ {address} พร้อม args: {args}")
 
-    # 1. สั่งโปรแกรมอื่นทำงานและรับค่า
-    received_data_from_other_program = communicate_with_other_program(SOCKET_COMMAND_TO_START)
-    
-    if received_data_from_other_program is not None:
-        # 2. นำค่าที่ได้มาคำนวณต่อ
-        final_calculated_value = perform_calculation(received_data_from_other_program)
+    # 1. สร้างข้อมูลสุ่มขึ้นมาแทนการเรียกจากโปรแกรมอื่น
+    final_calculated_value = perform_calculation("dummy_data")
 
-        if final_calculated_value is not None:
-            # 3. ส่งผลลัพธ์กลับไปยัง UI
-            send_osc_result(final_calculated_value)
-        else:
-            print("[Main Flow] การคำนวณล้มเหลว ไม่สามารถส่งผลลัพธ์ได้")
-    else:
-        print("[Main Flow] ไม่ได้รับข้อมูลจากโปรแกรมอื่น ไม่สามารถดำเนินการต่อได้")
-    
-    final_calculated_value = perform_calculation(received_data_from_other_program)
+    # 2. รอ 10 วินาที
+    print("รอ 10 วินาทีก่อนส่งคะแนน...")
+    time.sleep(10)
+
+    # 3. ส่งผลลัพธ์กลับไปยัง UI
     send_osc_result(final_calculated_value)
+
 # --- Main Execution Block ---
 if __name__ == "__main__":
     # ตั้งค่า OSC Dispatcher (กำหนดว่า OSC address ไหนจะเรียกฟังก์ชันอะไร)
@@ -162,12 +121,3 @@ if __name__ == "__main__":
         print("\nOSC Server กำลังหยุดทำงาน...")
         server.shutdown()
         print("OSC Server หยุดทำงานแล้ว")
-
-
-
-
-
-
-
-
-
